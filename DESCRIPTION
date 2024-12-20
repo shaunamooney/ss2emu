@@ -1,5 +1,5 @@
 Package: ss2emu
-Title: What the Package Does (One Line, Title Case)
+Title: Calculate Estimated Modern Use with Uncertainty
 Version: 0.0.0.9000
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
@@ -10,3 +10,16 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports:
+  R2jags,
+  dplyr,
+  readxl,
+  stringr,
+  tidyr,
+  tidyverse,
+  ggplot2,
+  patchwork,
+  readr
+Depends: 
+    R (>= 2.10)
+LazyData: true

@@ -4,12 +4,12 @@
 \alias{run_subnational}
 \title{Running subnational shinyss2emu for subnational levels. Saves a CSV file and a pdf in the specified directory.}
 \usage{
-run_subnational(subnational_tools_filepath, input_shiny_type)
+run_subnational(subnational_tools_filepath, input_type)
 }
 \arguments{
 \item{subnational_tools_filepath}{The filepath in which all individual subnational SS-to-EMU tools are located.}
 
-\item{input_shiny_type}{The service statistics type to use.}
+\item{input_type}{The service statistics type to use.}
 }
 \value{
 a list containing an emu database and a list of plots.

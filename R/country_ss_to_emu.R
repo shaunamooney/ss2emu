@@ -1,14 +1,14 @@
 #' Calculating EMU from excel spreadsheet using modelled supply-share estimates, and saving output in specified files
 #' @name country_ss_to_emu
 #' @param country_tools_info Country tools info (get_tools_info() output)
-#' @param shiny_input_type The chosen service type (in the Shiny UI)
+#' @param input_type The chosen service type (in the Shiny UI)
 #' @param method_summary Summarise by method or not (TRUE/FALSE)
 #' @param save_samples Save samples for analysis (TRUE/FALSE)
 #' @import tidyverse
 #' @import stringr
 #' @export
 
-country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, method_summary = FALSE, save_samples = FALSE){
+country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summary = FALSE, save_samples = FALSE){
 
   ss_tools_info <- country_tools_info
   country_emu_df <- list()
@@ -18,7 +18,7 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
   private_sector_adj_samples <- list()
   commodities_table_samples <- list()
 
-  if(is.null(shiny_input_type)){
+  if(is.null(input_type)){
     ss_data_types <- c("Contraceptive commodities distributed to clients",
                        "Contraceptive commodities distributed to facilities",
                        "FP visits",
@@ -27,10 +27,10 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
 
   else {
 
-    ss_data_types <- ifelse(shiny_input_type == "clients", "Contraceptive commodities distributed to clients",
-                       ifelse(shiny_input_type == "facilities", "Contraceptive commodities distributed to facilities",
-                              ifelse(shiny_input_type == "users", "FP users",
-                                     ifelse(shiny_input_type == "visits", "FP visits", NA))))
+    ss_data_types <- ifelse(input_type == "clients", "Contraceptive commodities distributed to clients",
+                       ifelse(input_type == "facilities", "Contraceptive commodities distributed to facilities",
+                              ifelse(input_type == "users", "FP users",
+                                     ifelse(input_type == "visits", "FP visits", NA))))
 
   }
 

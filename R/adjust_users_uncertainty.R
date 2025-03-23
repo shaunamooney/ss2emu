@@ -27,6 +27,9 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
     country_name <- "Cote d'Ivoire"
   }
 
+  if(country_name == "Example"){
+    country_name <- "Cameroon"
+  }
 
   country_fp_source_data <- fp_source_data_wide %>% filter(name == country_name) #%>% filter(year %in% emu_years)
 
@@ -89,6 +92,8 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
     country_name <- "Congo Democratic Republic"
   }
 
+
+
   # & year %in% emu_years
   supply_share_sd <- supply_share_sd %>%
     mutate(year = floor(average_year)) %>%
@@ -106,8 +111,6 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
   if(nrow(supply_share_sd) > 0) {
 
   model_input <- left_join(FP_source_data_temp, supply_share_sd %>% mutate(method_overview = as.character(method_overview)))
-
-
 
   model_methods <- supply_share_sd %>% pull(method_overview) %>% unique()
 

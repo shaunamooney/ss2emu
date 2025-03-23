@@ -2,12 +2,14 @@
 % Please edit documentation in R/get_tools_info.R
 \name{get_tools_info}
 \alias{get_tools_info}
-\title{Get tools information from SS-to-EMU Excel spreadsheet}
+\title{Get tools information from SS-to-EMU Excel spreadsheet for the ss2emu shiny app}
 \usage{
-get_tools_info(country_file_path)
+get_tools_info(country_file_path, input_type)
 }
 \arguments{
 \item{country_file_path}{Location of the country's SS-to-EMU Excel spreadsheet}
+
+\item{input_type}{Chosen service statistics type}
 }
 \description{
 This function reads an Excel spreadsheet containing tools information

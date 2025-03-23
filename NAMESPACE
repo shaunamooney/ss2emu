@@ -3,7 +3,7 @@
 export(adjust_users_uncertainty)
 export(calculate_emu_from_users)
 export(country_ss_to_emu)
-export(get_shiny_tools_info)
+export(get_all_tools_info)
 export(get_tools_info)
 export(plot_emu_data)
 export(run_subnational)

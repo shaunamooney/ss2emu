@@ -1,13 +1,13 @@
 #' Running subnational shinyss2emu for subnational levels. Saves a CSV file and a pdf in the specified directory.
 #' @name run_subnational
 #' @param subnational_tools_filepath The filepath in which all individual subnational SS-to-EMU tools are located.
-#' @param input_shiny_type The service statistics type to use.
+#' @param input_type The service statistics type to use.
 #' @return a list containing an emu database and a list of plots.
 #' @import R2jags
 #' @export
 #'
 
-run_subnational <- function(subnational_tools_filepath, input_shiny_type){
+run_subnational <- function(subnational_tools_filepath, input_type){
 
   tools_info <- list()
   emu_output <- list()
@@ -18,8 +18,8 @@ run_subnational <- function(subnational_tools_filepath, input_shiny_type){
   region_files <- list.files(subnational_tools_filepath, pattern = "\\.xlsx$|\\.xlsm$")
   for (i in 1:length(region_files)) {
     print(region_files[i])
-    tools_info[[i]] <- get_shiny_tools_info(country_file_path = paste0(subnational_tools_filepath, "/",region_files[i]), input_shiny_type)
-    emu_output[[i]] <- country_ss_to_emu(tools_info[[i]], input_shiny_type, method_summary = FALSE)
+    tools_info[[i]] <- get_tools_info(country_file_path = paste0(subnational_tools_filepath, "/",region_files[i]), input_type)
+    emu_output[[i]] <- country_ss_to_emu(tools_info[[i]], input_type, method_summary = FALSE)
 
     emu_dataset[[i]] <- emu_output[[i]]
 

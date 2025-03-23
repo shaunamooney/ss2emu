@@ -6,7 +6,7 @@
 \usage{
 country_ss_to_emu(
   country_tools_info,
-  shiny_input_type = NULL,
+  input_type = NULL,
   method_summary = FALSE,
   save_samples = FALSE
 )
@@ -14,7 +14,7 @@ country_ss_to_emu(
 \arguments{
 \item{country_tools_info}{Country tools info (get_tools_info() output)}
 
-\item{shiny_input_type}{The chosen service type (in the Shiny UI)}
+\item{input_type}{The chosen service type (in the Shiny UI)}
 
 \item{method_summary}{Summarise by method or not (TRUE/FALSE)}
 

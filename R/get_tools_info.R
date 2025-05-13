@@ -132,7 +132,8 @@ get_tools_info <- function(country_file_path, input_type){
   row_1 <- first_cell %%  rows
   row_last <-    row_1 + 22
 
-  sheet3_clean.scale <- data.frame(test_sheet3[43:(43+6), 3:(3+8)])
+
+  sheet3_clean.scale <- data.frame(test_sheet3[52:(52+6), 3:(3+8)])
   colnames(sheet3_clean.scale) <- seq_len(ncol(sheet3_clean.scale))
   sheet3_clean.scale <- sheet3_clean.scale %>%
     dplyr::select(1,3,6,9) %>%
@@ -468,7 +469,8 @@ get_tools_info <- function(country_file_path, input_type){
     test_type <- as.matrix(read_excel(country_file_path, sheet = "6a. Commodities (Clients) Input"))
 
     output_data <- readxl::read_excel(country_file_path, sheet = "6c.Commodities (Clients) Output")
-    condoms <- output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to clients")
+
+    condoms <- output_data[99,3] %>% mutate(ss_type = "Contraceptive commodities distributed to clients")
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Clients") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
@@ -558,7 +560,7 @@ get_tools_info <- function(country_file_path, input_type){
     test_type <- as.matrix(read_excel(country_file_path, sheet = "7a. Commodities (Facility) Input"))
 
     output_data <- readxl::read_excel(country_file_path, sheet = "7c. Comm (Facility) Output")
-    condoms <- output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to facilities")
+    condoms <- output_data[99,3] %>% mutate(ss_type = "Contraceptive commodities distributed to facilities")
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Facilities") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
@@ -649,7 +651,7 @@ get_tools_info <- function(country_file_path, input_type){
     test_type <- as.matrix(read_excel(country_file_path, sheet = "8a. Visits Input"))
 
     output_data <- readxl::read_excel(country_file_path, sheet = "8c. Visits Output")
-    condoms <- output_data[99,2] %>% mutate(ss_type = "FP visits")
+    condoms <- output_data[99,3] %>% mutate(ss_type = "FP visits")
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Visits") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
@@ -738,7 +740,7 @@ get_tools_info <- function(country_file_path, input_type){
     test_type <- as.matrix(read_excel(country_file_path, sheet = "9a. Users Input"))
 
     output_data <- readxl::read_excel(country_file_path, sheet = "9c. Users Output")
-    condoms <- output_data[99,2] %>% mutate(ss_type = "FP users")
+    condoms <- output_data[99,3] %>% mutate(ss_type = "FP users")
 
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Users") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
@@ -843,6 +845,7 @@ get_tools_info <- function(country_file_path, input_type){
 
 
 
+
   cyp_factors_long <- sheet_data[21:28, 2:6] %>%
     as_tibble() %>%
     rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
@@ -852,7 +855,7 @@ get_tools_info <- function(country_file_path, input_type){
            ss_type = input_type)
 
 
-  cyp_factors_short <- sheet_data[30:44, 2:6] %>%
+  cyp_factors_short <- sheet_data[30:45, 2:6] %>%
     as_tibble() %>%
     rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
     fill(method_overview, .direction = "down") %>%

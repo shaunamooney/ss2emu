@@ -943,16 +943,7 @@ get_tools_info <- function(country_file_path, input_type){
                                         ifelse(grepl("visites par an", units, ignore.case = TRUE), "visits per year",
                                                ifelse(grepl("consultation par utilisateur", units, ignore.case = TRUE), "consultations per user", units)))))) %>% tidyr::drop_na(cyp_factor)
 
-  cyp_table <- cyp_table_all %>%
-    mutate(relative_sd = ifelse(method_overview == "Condom", 0.25,
-                                ifelse(method_detail == "LAM", 0.2,
-                                       ifelse(method_detail == "EC", 0.2,
-                                              ifelse(method_overview == "Pill", 0.17,
-                                                     ifelse(method_overview == "Implant", 0.15,
-                                                            ifelse(method_overview == "IUD", 0.1,
-                                                                   ifelse(method_detail %in% c("Sayana Press", "Depo Provera (DMPA)"), 0.06,
-                                                                          ifelse(method_detail %in% c("Noristerat (NET-En)", "Lunelle", "Other Injectable"), 0.05,
-                                                                                 ifelse(method_overview %in% c("Sterilization"), 0.025, 0.025))))))))))
+  cyp_table <- cyp_table_all
 
 
 

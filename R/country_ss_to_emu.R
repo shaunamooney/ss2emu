@@ -58,7 +58,7 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
 
     cyp_table_clean <- cyp_table %>%
       mutate(method_type = ifelse(method_type == "long", "Long", "Short")) %>%
-      select(-ss_type, -relative_sd)
+      select(-ss_type)
 
     if(nrow(ss_quantity_data) == 0){
       next

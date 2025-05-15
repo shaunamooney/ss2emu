@@ -40,11 +40,11 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
     pop_dataset <- ss_tools_info$pop_dataset
     setup_data <- ss_tools_info$setup_data
     recode_sectors_reporting <- ss_tools_info$recode_sectors_reporting
-    recode_scaleup_table <- ss_tools_info$recode_scaleup_table
+    recode_scaleup_table <- ss_tools_info$recode_scaleup_table # check this
     ss_info <- ss_tools_info$ss_info %>% filter(ss_type == s)
     cyp_table <- ss_tools_info$cyp_table %>% filter(ss_type == s)
     reporting_rates <- ss_tools_info$reporting_rates_table %>% filter(ss_type == s)
-    ss_val_type <- ss_tools_info$ss_val_type
+    ss_val_type <- ss_tools_info$ss_val_type # this is null
 
     if(s != "FP users"){
     long_term_rates <- ss_tools_info$method_continuation_data %>%

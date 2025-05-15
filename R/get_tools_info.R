@@ -174,7 +174,7 @@ get_tools_info <- function(country_file_path, input_type){
   # FPsource - Sectors Reporting ---------------------------------------------
   test_sheet4 <- as.matrix(read_excel(country_file_path, sheet = "4. FPSource Set Up"))
 
-  user_input_adjustment_table <- tibble(method_overview = test_sheet4[199:219,4], include_adjustment = test_sheet4[199:219,9]) %>% drop_na(method_overview) %>% distinct()
+  user_input_adjustment_table <- tibble(method_overview = test_sheet4[199:220,4], include_adjustment = test_sheet4[199:220,9]) %>% drop_na(method_overview) %>% distinct()
 
 
   sheet4_reporting_clean <- data.frame(test_sheet4[101:104, 2:10]) %>%
@@ -468,6 +468,7 @@ get_tools_info <- function(country_file_path, input_type){
     sheet_data <- readxl::read_excel(country_file_path, sheet = "6a. Commodities (Clients) Input")
     test_type <- as.matrix(read_excel(country_file_path, sheet = "6a. Commodities (Clients) Input"))
 
+
     output_data <- readxl::read_excel(country_file_path, sheet = "6c.Commodities (Clients) Output")
 
     condoms <- output_data[99,3] %>% mutate(ss_type = "Contraceptive commodities distributed to clients")
@@ -556,8 +557,8 @@ get_tools_info <- function(country_file_path, input_type){
 
 
   if(input_type == "facilities"){
-    sheet_data <- readxl::read_excel(country_file_path, sheet = "7a. Commodities (Facility) Input")
-    test_type <- as.matrix(read_excel(country_file_path, sheet = "7a. Commodities (Facility) Input"))
+    sheet_data <- readxl::read_excel(country_file_path, sheet = "7a.Commodities (Facility) Input")
+    test_type <- as.matrix(read_excel(country_file_path, sheet = "7a.Commodities (Facility) Input"))
 
     output_data <- readxl::read_excel(country_file_path, sheet = "7c. Comm (Facility) Output")
     condoms <- output_data[99,3] %>% mutate(ss_type = "Contraceptive commodities distributed to facilities")
@@ -774,7 +775,7 @@ get_tools_info <- function(country_file_path, input_type){
     row_1 <- (first_cell %%  rows) + 5
     row_last <-    row_1 + 25
 
-    matrix_type <- test_type[row_1:row_last, col_1:col_last]
+    matrix_type <- test_type[row_1:row_last, col_1:(col_last + 5)] # added this for now
     matrix_type[1,1] <- "Method"
     matrix_type[1,3] <- "CYP"
 

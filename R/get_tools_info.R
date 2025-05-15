@@ -23,11 +23,11 @@ get_tools_info <- function(country_file_path, input_type){
   country_sheet <- "1. Country_Language Set Up"
   pop_sheet <- "2. Pop_Prev Set Up"
 
-  if ("EMU Output" %in% sheet_names){
+  if ("10. EMU Output" %in% sheet_names){
     emu_output_sheet <- "EMU Output"
   }
   else{
-    emu_output_sheet <- "\"EMU\" Output"
+    emu_output_sheet <- "10. \"EMU\" Output"
   }
 
   ss_setup_sheet <- "3. ServiceStats Set Up"
@@ -60,14 +60,14 @@ get_tools_info <- function(country_file_path, input_type){
   if (set_up_table$language == "English") {
     pop_sheet_data <- readxl::read_excel(country_file_path, sheet = pop_sheet)
     pop_col_index <- which(colnames(pop_sheet_data) == "Set up: Enter Background Data - Population and Prevalence") + 1
-    pop_data <- pop_sheet_data[,pop_col_index]
-    pop_dataset <- pop_sheet_data %>% dplyr::mutate(year = as.numeric(`Set up: Enter Background Data - Population and Prevalence`))
-    pop_dataset$population <- pop_data
+    years <- pop_sheet_data[,pop_col_index]
+    pop_data <- pop_sheet_data[,pop_col_index + 1]
+    pop_dataset <- tibble(year = as.numeric(years %>% unlist()), population = pop_data %>% unlist())
     pop_dataset <- pop_dataset %>%
-      tidyr::drop_na(year) %>% dplyr::select(year, population) %>% dplyr::mutate(population = as.numeric(unlist(population))) %>% dplyr::mutate(pop_type = set_up_table$AW_or_MW)
+      tidyr::drop_na(year) %>% dplyr::select(year, population) %>% dplyr::mutate(population = as.numeric(population)) %>% dplyr::mutate(pop_type = set_up_table$AW_or_MW)
 
-    mcpr_mw <- pop_sheet_data %>% tidyr::drop_na(...11) %>% dplyr::pull(...11) %>% as.numeric() %>% .[complete.cases(.)]
-    mcpr_aw <- pop_sheet_data %>% tidyr::drop_na(...12) %>% dplyr::pull(...12) %>% as.numeric() %>% .[complete.cases(.)]
+    mcpr_mw <- pop_sheet_data %>% tidyr::drop_na(...12) %>% dplyr::pull(...12) %>% as.numeric() %>% .[complete.cases(.)]
+    mcpr_aw <- pop_sheet_data %>% tidyr::drop_na(...13) %>% dplyr::pull(...13) %>% as.numeric() %>% .[complete.cases(.)]
 
     if(set_up_table$AW_or_MW == "AW")
     {
@@ -81,16 +81,15 @@ get_tools_info <- function(country_file_path, input_type){
   } else if (set_up_table$language == "Francais") {
     pop_sheet_data <- readxl::read_excel(country_file_path, sheet = pop_sheet)
     pop_col_index <- which(colnames(pop_sheet_data) == "Configuration : Entrez les Données Générales") + 1
-    pop_data <- pop_sheet_data[,pop_col_index]
-    pop_dataset <- pop_sheet_data %>% mutate(year = as.numeric(`Configuration : Entrez les Données Générales`))
-    pop_dataset$population <- pop_data
+    years <- pop_sheet_data[,pop_col_index]
+    pop_data <- pop_sheet_data[,pop_col_index + 1]
+    pop_dataset <- tibble(year = as.numeric(years %>% unlist()), population = pop_data %>% unlist())
     pop_dataset <- pop_dataset %>%
-      tidyr::drop_na(year) %>%
-      dplyr::select(year, population) %>%
-      dplyr::mutate(population = as.numeric(unlist(population))) %>% dplyr::mutate(pop_type = set_up_table$AW_or_MW)
+      tidyr::drop_na(year) %>% dplyr::select(year, population) %>% dplyr::mutate(population = as.numeric(population)) %>% dplyr::mutate(pop_type = set_up_table$AW_or_MW)
 
-    mcpr_mw <- pop_sheet_data %>% tidyr::drop_na(...11) %>% dplyr::pull(...11) %>% as.numeric() %>% .[complete.cases(.)]
-    mcpr_aw <- pop_sheet_data %>% tidyr::drop_na(...12) %>% dplyr::pull(...12) %>% as.numeric() %>% .[complete.cases(.)]
+    mcpr_mw <- pop_sheet_data %>% tidyr::drop_na(...12) %>% dplyr::pull(...12) %>% as.numeric() %>% .[complete.cases(.)]
+    mcpr_aw <- pop_sheet_data %>% tidyr::drop_na(...13) %>% dplyr::pull(...13) %>% as.numeric() %>% .[complete.cases(.)]
+
 
     if(set_up_table$AW_or_MW == "AW")
     {
@@ -133,8 +132,10 @@ get_tools_info <- function(country_file_path, input_type){
   row_1 <- first_cell %%  rows
   row_last <-    row_1 + 22
 
-  sheet3_clean.scale <- data.frame(test_sheet3[row_1:row_last, col_1:col_last])
-  sheet3_clean.scale <- sheet3_clean.scale[-1:-7, -1] %>%
+
+  sheet3_clean.scale <- data.frame(test_sheet3[52:(52+6), 3:(3+8)])
+  colnames(sheet3_clean.scale) <- seq_len(ncol(sheet3_clean.scale))
+  sheet3_clean.scale <- sheet3_clean.scale %>%
     dplyr::select(1,3,6,9) %>%
     dplyr::rename(Method=1, Clients=2, Facilities=3, Visits=4) %>%
     dplyr::mutate( Country=country_name) %>%
@@ -173,57 +174,10 @@ get_tools_info <- function(country_file_path, input_type){
   # FPsource - Sectors Reporting ---------------------------------------------
   test_sheet4 <- as.matrix(read_excel(country_file_path, sheet = "4. FPSource Set Up"))
 
-  user_input_adjustment_table <- tibble(method_overview = test_sheet4[168:189,3], include_adjustment = test_sheet4[168:189,8]) %>% drop_na(method_overview) %>% distinct()
+  user_input_adjustment_table <- tibble(method_overview = test_sheet4[199:220,4], include_adjustment = test_sheet4[199:220,9]) %>% drop_na(method_overview) %>% distinct()
 
 
-  # Pattern to be matched
-  pat_en <- "Method"
-  pat_fr <- "Method"
-  find_test_sheet4_en <-as.data.frame(as.matrix(str_detect(test_sheet4, pat_en) )) %>%
-    tibble::rowid_to_column()
-  find_test_sheet4_fr <-as.data.frame(as.matrix(str_detect(test_sheet4, pat_fr) )) %>%
-    tibble::rowid_to_column()
-  find_test_sheet4 <- bind_rows(find_test_sheet4_en, find_test_sheet4_fr) %>% dplyr::filter(V1=="TRUE")
-
-  first_cell <- min(find_test_sheet4$rowid)
-  rows <- nrow(test_sheet4)
-  cols <- ncol(test_sheet4)
-
-  col_1 <-  (first_cell %/%  rows ) + 1
-  col_last <- col_1 + 8
-
-  row_1 <- first_cell %%  rows
-  row_last <- row_1 + 23
-
-  sheet4_surveysource_clean <- data.frame(test_sheet4[row_1:row_last, col_1:col_last]) %>%
-    rename(Method=2, Type=3, PublicSector=4, NGO=5, PrivateHospital=6, Pharmacy=7, StoreChurchFriend=8, Other=9) %>%
-    select(Method, Type, PublicSector, NGO, PrivateHospital, Pharmacy, StoreChurchFriend, Other) %>%
-    filter(!is.na(Method)) %>%
-    mutate(PublicSector=as.numeric(PublicSector), NGO=as.numeric(NGO), PrivateHospital=as.numeric(PrivateHospital),
-           Pharmacy=as.numeric(Pharmacy), StoreChurchFriend=as.numeric(StoreChurchFriend), Other=as.numeric(Other))  %>%
-    mutate(Country=country_name)
-
-  # # # # # # # # # # # # # # # # # # # # # #
-  #Pattern to be matched
-  pat_en <- "Step 2 of 3: What sectors are reporting in your data?"
-  pat_fr <- "Étape 2 de 3: Quels secteurs rapportent dans votre système?"
-  find_test_sheet4_en <-as.data.frame(as.matrix(str_detect(test_sheet4, pat_en) )) %>%
-    tibble::rowid_to_column()
-  find_test_sheet4_fr <-as.data.frame(as.matrix(str_detect(test_sheet4, pat_fr) )) %>%
-    tibble::rowid_to_column()
-  find_test_sheet4 <- bind_rows(find_test_sheet4_en, find_test_sheet4_fr) %>% filter(V1=="TRUE")
-
-  first_cell <- min(find_test_sheet4$rowid)
-  rows <- nrow(test_sheet4)
-  cols <- ncol(test_sheet4)
-
-  col_1 <-  (first_cell %/%  rows ) + 1
-  col_last <- col_1 + 8
-
-  row_1 <- first_cell %%  rows
-  row_last <-    row_1 + 13
-
-  sheet4_reporting_clean <- data.frame(test_sheet4[row_1:row_last, col_1:col_last]) %>%
+  sheet4_reporting_clean <- data.frame(test_sheet4[101:104, 2:10]) %>%
     rename( Type=1, PublicSector=4, NGO=5, PrivateHospital=6, Pharmacy=7, StoreChurchFriend=8, Other=9) %>%
     select(Type, PublicSector, NGO, PrivateHospital, Pharmacy, StoreChurchFriend, Other) %>%
     filter(PublicSector=="1" | PublicSector=="0") %>%
@@ -256,9 +210,9 @@ get_tools_info <- function(country_file_path, input_type){
                                                                                                                       ifelse(grepl("facilities", ss_type, ignore.case = TRUE), "Contraceptive commodities distributed to facilities",
                                                                                                                              ifelse(grepl("users", ss_type, ignore.case = TRUE), "FP users", ss_type)))))))))
 
-  sectors_reporting <- test_sheet4[45:48, 1:3] %>% as.data.frame() %>% select(1,3)
-  colnames(sectors_reporting) <- c("ss_type", "Sectors Reporting")
-  sectors_reporting <- sectors_reporting %>% mutate(ss_type = ifelse(grepl("Utilisatrices", ss_type, ignore.case = TRUE), "FP users",
+  #sectors_reporting <- test_sheet4[45:48, 1:3] %>% as.data.frame() %>% select(1,3)
+  #colnames(sectors_reporting) <- c("ss_type", "Sectors Reporting")
+  sectors_reporting <- sheet4_reporting_clean %>% mutate(ss_type = ifelse(grepl("Utilisatrices", ss_type, ignore.case = TRUE), "FP users",
                                                                          ifelse(grepl("Utilisateurs", ss_type, ignore.case = TRUE), "FP users",
                                                                                 ifelse(grepl("clients", ss_type, ignore.case = TRUE), "Contraceptive commodities distributed to clients",
                                                                                        ifelse(grepl("visites", ss_type, ignore.case = TRUE), "FP visits",
@@ -267,9 +221,9 @@ get_tools_info <- function(country_file_path, input_type){
                                                                                                             ifelse(grepl("facilities", ss_type, ignore.case = TRUE), "Contraceptive commodities distributed to facilities",
                                                                                                                    ifelse(grepl("users", ss_type, ignore.case = TRUE), "FP users", ss_type)))))))))
 
-  recode_sectors_reporting <- left_join(sheet4_reporting_clean, sectors_reporting, by = "ss_type") %>% mutate(Presence = ifelse(Presence_recode == 1, "Yes",
-                                                                                                                                  ifelse(Presence_recode == 0.5, "Partially",
-                                                                                                                                         ifelse(Presence_recode == "0", "No", NA))))
+  recode_sectors_reporting <- sectors_reporting %>% mutate(Presence = ifelse(Presence_recode == 1, "Yes",
+                                                                             ifelse(Presence_recode == 0.5, "Partially",
+                                                                                    ifelse(Presence_recode == "0", "No", NA))))
 
 
 
@@ -277,6 +231,8 @@ get_tools_info <- function(country_file_path, input_type){
 
 
   # FPsource step 3
+
+  emu_output_sheet_data <- readxl::read_excel(country_file_path, sheet = emu_output_sheet)
 
   # Reporting rates ----------------------------------------------------------
 
@@ -333,7 +289,6 @@ get_tools_info <- function(country_file_path, input_type){
 
   reporting_rates_data <- reporting_rate_dataset_long %>%
     tidyr::pivot_wider(id_cols = ss_type, names_from = year, values_from = reporting_rate) %>% rename(ss_type = ss_type)
-
 
   # SS type input data
 
@@ -510,11 +465,13 @@ get_tools_info <- function(country_file_path, input_type){
 
   if(input_type == "clients"){
 
-    sheet_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Clients) Input")
-    test_type <- as.matrix(read_excel(country_file_path, sheet = "Commodities (Clients) Input"))
+    sheet_data <- readxl::read_excel(country_file_path, sheet = "6a. Commodities (Clients) Input")
+    test_type <- as.matrix(read_excel(country_file_path, sheet = "6a. Commodities (Clients) Input"))
 
-    output_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Clients) Output")
-    condoms <- output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to clients")
+
+    output_data <- readxl::read_excel(country_file_path, sheet = "6c.Commodities (Clients) Output")
+
+    condoms <- output_data[99,3] %>% mutate(ss_type = "Contraceptive commodities distributed to clients")
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Clients") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
@@ -600,11 +557,11 @@ get_tools_info <- function(country_file_path, input_type){
 
 
   if(input_type == "facilities"){
-    sheet_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Facility) Input")
-    test_type <- as.matrix(read_excel(country_file_path, sheet = "Commodities (Facility) Input"))
+    sheet_data <- readxl::read_excel(country_file_path, sheet = "7a.Commodities (Facility) Input")
+    test_type <- as.matrix(read_excel(country_file_path, sheet = "7a.Commodities (Facility) Input"))
 
-    output_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Facility) Output")
-    condoms <- output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to facilities")
+    output_data <- readxl::read_excel(country_file_path, sheet = "7c. Comm (Facility) Output")
+    condoms <- output_data[99,3] %>% mutate(ss_type = "Contraceptive commodities distributed to facilities")
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Facilities") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
@@ -691,11 +648,11 @@ get_tools_info <- function(country_file_path, input_type){
 
   if(input_type == "visits"){
 
-    sheet_data <- readxl::read_excel(country_file_path, sheet = "Visits Input")
-    test_type <- as.matrix(read_excel(country_file_path, sheet = "Visits Input"))
+    sheet_data <- readxl::read_excel(country_file_path, sheet = "8a. Visits Input")
+    test_type <- as.matrix(read_excel(country_file_path, sheet = "8a. Visits Input"))
 
-    output_data <- readxl::read_excel(country_file_path, sheet = "Visits Output")
-    condoms <- output_data[99,2] %>% mutate(ss_type = "FP visits")
+    output_data <- readxl::read_excel(country_file_path, sheet = "8c. Visits Output")
+    condoms <- output_data[99,3] %>% mutate(ss_type = "FP visits")
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Visits") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
@@ -780,11 +737,11 @@ get_tools_info <- function(country_file_path, input_type){
 
   if(input_type == "users"){
 
-    sheet_data <- readxl::read_excel(country_file_path, sheet = "Users Input")
-    test_type <- as.matrix(read_excel(country_file_path, sheet = "Users Input"))
+    sheet_data <- readxl::read_excel(country_file_path, sheet = "9a. Users Input")
+    test_type <- as.matrix(read_excel(country_file_path, sheet = "9a. Users Input"))
 
-    output_data <- readxl::read_excel(country_file_path, sheet = "Users Output")
-    condoms <- output_data[99,2] %>% mutate(ss_type = "FP users")
+    output_data <- readxl::read_excel(country_file_path, sheet = "9c. Users Output")
+    condoms <- output_data[99,3] %>% mutate(ss_type = "FP users")
 
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Users") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
@@ -818,7 +775,7 @@ get_tools_info <- function(country_file_path, input_type){
     row_1 <- (first_cell %%  rows) + 5
     row_last <-    row_1 + 25
 
-    matrix_type <- test_type[row_1:row_last, col_1:col_last]
+    matrix_type <- test_type[row_1:row_last, col_1:(col_last + 5)] # added this for now
     matrix_type[1,1] <- "Method"
     matrix_type[1,3] <- "CYP"
 
@@ -889,6 +846,7 @@ get_tools_info <- function(country_file_path, input_type){
 
 
 
+
   cyp_factors_long <- sheet_data[21:28, 2:6] %>%
     as_tibble() %>%
     rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
@@ -898,7 +856,7 @@ get_tools_info <- function(country_file_path, input_type){
            ss_type = input_type)
 
 
-  cyp_factors_short <- sheet_data[30:44, 2:6] %>%
+  cyp_factors_short <- sheet_data[30:45, 2:6] %>%
     as_tibble() %>%
     rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
     fill(method_overview, .direction = "down") %>%
@@ -944,11 +902,6 @@ get_tools_info <- function(country_file_path, input_type){
                                                ifelse(grepl("consultation par utilisateur", units, ignore.case = TRUE), "consultations per user", units)))))) %>% tidyr::drop_na(cyp_factor)
 
   cyp_table <- cyp_table_all
-
-
-
-
-
 
 
 

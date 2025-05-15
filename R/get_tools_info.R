@@ -105,7 +105,7 @@ get_tools_info <- function(country_file_path, input_type){
   language <- set_up_table$language
 
   if(setup_data$National_or_Subnational != "National"){
-    setup_data <- setup_data %>% mutate(Region = country_sheet_data[7,7] %>% as.character())
+    setup_data <- setup_data %>% mutate(Region = country_sheet_data[7,8] %>% as.character())
   }
 
   # Service stats tab scaling step

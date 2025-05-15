@@ -743,7 +743,6 @@ get_tools_info <- function(country_file_path, input_type){
     output_data <- readxl::read_excel(country_file_path, sheet = "9c. Users Output")
     condoms <- output_data[99,3] %>% mutate(ss_type = "FP users")
 
-
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Users") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
     last_year_df <- sheet3_servicestats_data %>% filter(Type=="Users") %>% filter(Question=="Most recent full year of data available:" | Question=="Plus récent complet année de données disponibles:") %>%
@@ -758,7 +757,9 @@ get_tools_info <- function(country_file_path, input_type){
     # # # # # # # # # # #  # # # # # #
     #Pattern to be matched
     pat_en <- "STEP 2 of 3. ENTER USERS DATA"
-    pat_fr <- "ÉTAPE 2 of 3. SAISIR LES DONNÉES DES UTILISATEURS"
+    #pat_fr <- "ÉTAPE 2 of 3. SAISIR LES DONNÉES DES UTILISATEURS"
+
+    pat_fr <- "ÉTAPE 2 of 3. SAISIR LES DONNÉES DES UTILISATRICES"
     find_test_en <-as.data.frame(as.matrix(str_detect(test_type, pat_en) )) %>%
       tibble::rowid_to_column()
     find_test_fr <-as.data.frame(as.matrix(str_detect(test_type, pat_fr) )) %>%
@@ -775,7 +776,7 @@ get_tools_info <- function(country_file_path, input_type){
     row_1 <- (first_cell %%  rows) + 5
     row_last <-    row_1 + 25
 
-    matrix_type <- test_type[row_1:row_last, col_1:(col_last + 5)] # added this for now
+    matrix_type <- test_type[row_1:row_last, col_1:(col_last)] # added this for now
     matrix_type[1,1] <- "Method"
     matrix_type[1,3] <- "CYP"
 

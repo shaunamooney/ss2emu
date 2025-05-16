@@ -355,6 +355,10 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
     users_inc_private_sector_df_fixed <- users_inc_private_sector_df %>% select(-sample_id)
 
     inverse_adjustment_table <- NULL
+
+    supply_share_mod_res <- NULL
+
+    FP_source_data_samples <- NULL
   }
 
   else {

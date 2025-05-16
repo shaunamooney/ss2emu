@@ -78,6 +78,7 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
       baseline_users <- baseline_users(ss_data, s, recode_scaleup_table, long_term_rates)
     }
 
+
     uncertainty_adjust <- adjust_users_uncertainty(recode_sectors_reporting,
                                                    reporting_rates,
                                                    baseline_users,
@@ -100,11 +101,13 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
 
     ss_type_number <- match(s, ss_data_types)
 
-
     commodities_table_samples[[ss_type_number]] <- uncertainty_adjust$users_incl_private %>% mutate(ss_type = s)
-    sector_share_samples[[ss_type_number]] <- uncertainty_adjust$supply_share_mod_res %>% mutate(ss_type = s)
-    facility_share_samples[[ss_type_number]] <- uncertainty_adjust$FP_source_data_samples %>% mutate(ss_type = s)
-    private_sector_adj_samples[[ss_type_number]] <- uncertainty_adjust$inverse_adjustment_table %>% mutate(ss_type = s)
+
+    if(!is.null(uncertainty_adjust$supply_share_mod_res)){
+      sector_share_samples[[ss_type_number]] <- uncertainty_adjust$supply_share_mod_res %>% mutate(ss_type = s)
+      facility_share_samples[[ss_type_number]] <- uncertainty_adjust$FP_source_data_samples %>% mutate(ss_type = s)
+      private_sector_adj_samples[[ss_type_number]] <- uncertainty_adjust$inverse_adjustment_table %>% mutate(ss_type = s)
+    }
 
 
     if(Country == "DR Congo"){
@@ -144,27 +147,6 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
   fixed_emu <- data.table::rbindlist(fixed_country_emu_df) %>% as_tibble()
   all_emu_out <- emu_samps %>% group_by(sample_id, name, ss_type) %>% mutate(delta_emu = emu - lag(emu))
 
-  all_commodities_table_samples <- data.table::rbindlist(commodities_table_samples) %>% as_tibble() %>% mutate(name = Country) %>%
-    mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
-                            ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
-                                   ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
-
-  all_sector_share_samples <- data.table::rbindlist(sector_share_samples) %>% as_tibble() %>% mutate(name = Country) %>%
-    mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
-                            ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
-                                   ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
-
-  all_facility_share_samples <- data.table::rbindlist(facility_share_samples) %>% as_tibble() %>% mutate(name = Country) %>%
-    mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
-                            ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
-                                   ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
-
-  all_private_sector_adj_samples <- data.table::rbindlist(private_sector_adj_samples) %>% as_tibble() %>% mutate(name = Country) %>%
-    mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
-                            ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
-                                   ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
-
-
   overall_emu <- all_emu_out %>%
     group_by(division_numeric_code, name, pop_type, ss_type, year) %>%
     summarise(median_emu = median(emu),
@@ -191,6 +173,28 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
                        ss_val_type = ss_val_type)
 
   if(save_samples == TRUE){
+
+    all_commodities_table_samples <- data.table::rbindlist(commodities_table_samples) %>% as_tibble() %>% mutate(name = Country) %>%
+      mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
+                              ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
+                                     ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
+
+    all_sector_share_samples <- data.table::rbindlist(sector_share_samples) %>% as_tibble() %>% mutate(name = Country) %>%
+      mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
+                              ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
+                                     ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
+
+    all_facility_share_samples <- data.table::rbindlist(facility_share_samples) %>% as_tibble() %>% mutate(name = Country) %>%
+      mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
+                              ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
+                                     ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
+
+    all_private_sector_adj_samples <- data.table::rbindlist(private_sector_adj_samples) %>% as_tibble() %>% mutate(name = Country) %>%
+      mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
+                              ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
+                                     ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
+
+
     return(list(sector_share_samples = all_sector_share_samples,
                 facility_share_samples = all_facility_share_samples,
                 private_sector_adj_samples = all_private_sector_adj_samples,

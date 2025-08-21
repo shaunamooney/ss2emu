@@ -73,6 +73,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
   FP_source_data_long <- FP_source_data_temporal %>%
     pivot_longer(cols = c(-method_overview, -name, -year, -survey), names_to = "sector", values_to = "supply_share")
 
+
   fixed_inverse_adjustment_table <- left_join(FP_source_data_long, sectors_reporting_input %>%
                                                 rename(sector = Sector) %>%
                                                 select(-Country), by = "sector") %>%
@@ -127,6 +128,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
   model_input <- model_input %>% filter(!is.na(sd_logit_pub)) %>%
     mutate(info_id = row_number())
 
+  set.seed(12345)
   model_code <- "
     model {
       for(i in 1:N)

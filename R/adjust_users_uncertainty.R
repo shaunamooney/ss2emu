@@ -109,7 +109,8 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
     ))
 
 
-  if(nrow(supply_share_sd) > 0) {
+
+  if((nrow(supply_share_sd) > 0) & (nrow(FP_source_data_temp) > 0)) {
 
   model_input <- left_join(FP_source_data_temp, supply_share_sd %>% mutate(method_overview = as.character(method_overview)))
 
@@ -266,7 +267,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
                           ungroup()
 
 
-}
+  }
 
   if(s == "FP users"){
     users_table_overview_fixed <- commodities_table %>%
@@ -350,7 +351,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
  users_table_overview_fixed <- users_table_overview_fixed %>%
    mutate(method_overview = ifelse(method_detail == "Vasectomy (M)", "Male Sterilization", method_overview))
 
-  if(nrow(supply_share_sd) == 0){
+  if(nrow(supply_share_sd) == 0 | nrow(FP_source_data_temp) == 0){
     users_inc_private_sector_df <- users_table_overview_fixed %>%
       mutate(total_users = current_users*1) %>% filter(total_users > 0) %>% mutate(sample_id = 1)
 

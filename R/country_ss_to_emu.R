@@ -148,7 +148,7 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
                             ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
                                    ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
 
-
+  model_methods <- supply_share_sd %>% pull(method_overview) %>% unique()
   # Summarize the data
   priv_summary_data <- private_adj_samples %>%
     filter(method_overview %in% model_methods) %>%

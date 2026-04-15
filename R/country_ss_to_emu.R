@@ -143,18 +143,35 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
 
   }
 
+  private_adj_samples <- data.table::rbindlist(private_sector_adj_samples) %>% as_tibble() %>% mutate(name = Country) %>%
+    mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
+                            ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
+                                   ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
+
+
+  # Summarize the data
+  priv_summary_data <- private_adj_samples %>%
+    filter(method_overview %in% model_methods) %>%
+    group_by(year, method_overview) %>%
+    summarise(
+      median = median(inv_adj_factor) %>% signif(4),
+      lower_ci = quantile(inv_adj_factor, probs = 0.025) %>% signif(4),
+      upper_ci = quantile(inv_adj_factor, probs = 0.975) %>% signif(4)
+    ) %>%
+    ungroup() %>% filter(year > 2016)
+
   emu_samps <- data.table::rbindlist(country_emu_df) %>% as_tibble()
   fixed_emu <- data.table::rbindlist(fixed_country_emu_df) %>% as_tibble()
   all_emu_out <- emu_samps %>% group_by(sample_id, name, ss_type) %>% mutate(delta_emu = emu - lag(emu))
 
+
+
+  # 2026 Update - Matching fixed EMU and EMU roc
   overall_emu <- all_emu_out %>%
     group_by(division_numeric_code, name, pop_type, ss_type, year) %>%
-    summarise(median_emu = median(emu),
-              emu_roc = median(delta_emu),
-              sd_emu = sd(emu),
+    summarise(sd_emu = sd(emu),
               sd_emu_roc = sd(delta_emu, na.rm = TRUE)) %>%
-    arrange(ss_type) %>%
-    rename(emu = median_emu)
+    arrange(ss_type)
 
   if ("Region" %in% colnames(setup_data)){
     region_name <- setup_data$Region
@@ -163,14 +180,19 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
     region_name <- NA
   }
 
+  # 2026 - matching EMU and EMU_ROC with fixed estimates to align with tool
   overall_emu <- overall_emu %>%
-    mutate(emu = signif(emu,4),
-           emu_roc = signif(emu_roc, 4),
-           sd_emu = signif(sd_emu, 4),
+    mutate(sd_emu = signif(sd_emu, 4),
            sd_emu_roc = signif(sd_emu_roc, 4),
            Region = region_name
           ) %>% mutate(sd_emu_roc = ifelse(is.na(sd_emu_roc), 0, sd_emu_roc),
-                       ss_val_type = ss_val_type)
+                       ss_val_type = ss_val_type) %>%
+                        left_join(fixed_emu %>% select(year, emu)) %>%
+    arrange(year) %>%  # chronological order
+    mutate(emu_roc = emu - lag(emu)) %>%
+    mutate(emu = emu %>% signif(4),
+           emu_roc = emu_roc %>% signif(4)) %>%
+    select(division_numeric_code, name, pop_type, ss_type, year, emu, sd_emu, emu_roc, sd_emu_roc, everything())
 
   if(save_samples == TRUE){
 
@@ -200,9 +222,11 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
                 private_sector_adj_samples = all_private_sector_adj_samples,
                 emu_samples = all_emu_out,
                 commodities_table_samples = all_commodities_table_samples,
-                emu_dataset = overall_emu))
+                emu_dataset = overall_emu,
+                private_adj_summary = priv_summary_data))
   }
   else{
-    return(overall_emu)
+    return(list(emu_dataset = overall_emu,
+                private_adj_summary = priv_summary_data))
   }
 }

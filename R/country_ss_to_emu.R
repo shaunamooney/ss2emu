@@ -89,6 +89,16 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
 
     adjust_users_priv_sector <- uncertainty_adjust$users_incl_private
 
+    priv_summary_data <- adjust_users_priv_sector %>%
+      group_by(year, method_overview) %>%
+      summarise(
+        median = median(inv_adj_factor) %>% signif(4),
+        lower_ci = quantile(inv_adj_factor, probs = 0.025) %>% signif(4),
+        upper_ci = quantile(inv_adj_factor, probs = 0.975) %>% signif(4)
+      ) %>%
+      ungroup() %>%
+      arrange(method_overview)
+
     fixed_adjust_users_priv_sector <- uncertainty_adjust$user_incl_private_fixed
 
     total_adj_users <- total_adjusted_users(adjust_users_priv_sector, fixed_adjust_users_priv_sector, include_condoms_df, method_summary)
@@ -143,22 +153,6 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
 
   }
 
-  private_adj_samples <- data.table::rbindlist(private_sector_adj_samples) %>% as_tibble() %>% mutate(name = Country) %>%
-    mutate(ss_type = ifelse(ss_type == "Contraceptive commodities distributed to clients", "clients",
-                            ifelse(ss_type == "Contraceptive commodities distributed to facilities", "facilities",
-                                   ifelse(ss_type == "FP visits", "visits", ifelse(ss_type == "FP users", "users", ss_type)))))
-
-  model_methods <- supply_share_sd %>% pull(method_overview) %>% unique()
-  # Summarize the data
-  priv_summary_data <- private_adj_samples %>%
-    filter(method_overview %in% model_methods) %>%
-    group_by(year, method_overview) %>%
-    summarise(
-      median = median(inv_adj_factor) %>% signif(4),
-      lower_ci = quantile(inv_adj_factor, probs = 0.025) %>% signif(4),
-      upper_ci = quantile(inv_adj_factor, probs = 0.975) %>% signif(4)
-    ) %>%
-    ungroup() %>% filter(year > 2016)
 
   emu_samps <- data.table::rbindlist(country_emu_df) %>% as_tibble()
   fixed_emu <- data.table::rbindlist(fixed_country_emu_df) %>% as_tibble()

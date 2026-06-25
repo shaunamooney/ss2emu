@@ -353,7 +353,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
 
   if(nrow(supply_share_sd) == 0 | nrow(FP_source_data_temp) == 0){
     users_inc_private_sector_df <- users_table_overview_fixed %>%
-      mutate(total_users = current_users*1) %>% filter(total_users > 0) %>% mutate(sample_id = 1)
+      mutate(total_users = current_users*1) %>% filter(total_users > 0) %>% mutate(sample_id = 1, inv_adj_factor = 1)
 
     users_inc_private_sector_df_fixed <- users_inc_private_sector_df %>% select(-sample_id)
 

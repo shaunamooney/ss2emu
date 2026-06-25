@@ -78,7 +78,6 @@ country_ss_to_emu <- function(country_tools_info, input_type = NULL, method_summ
       baseline_users <- baseline_users(ss_data, s, recode_scaleup_table, long_term_rates)
     }
 
-
     uncertainty_adjust <- adjust_users_uncertainty(recode_sectors_reporting,
                                                    reporting_rates,
                                                    baseline_users,
